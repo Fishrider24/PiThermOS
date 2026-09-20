@@ -1,6 +1,6 @@
 # PiThermOS
 ## Pi Zero thermostat with touch screen, backup battery and auto restart. 
-## This is all very outdated libraries and OS. I've used it for 6 years with minor issues, but it has locked up before, with system not running, never locked up running.  Use at your own risk and please fork it and make it better.  I'm slowly trying to upgrade it.
+This is all very outdated libraries and OS. I've used it for 6 years with minor issues, but it has locked up before, with system not running, never locked up running.  Use at your own risk and please fork it and make it better.  I'm slowly trying to upgrade it.
 
 What I used: Raspberry Pi Zero2W, 3.5" 320x480 touchscreen, Pi Zero UPS Hat, BME280 humidity and temp board, esp-32S, G3MB-202P solid state relays.
 
