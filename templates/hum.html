@@ -1,0 +1,46 @@
+<html>
+<head>
+<style>
+body {background-color: powderblue;}
+</style>
+</head>
+<body>
+<h1><center>Humidity % Setpoint</center></h1>
+<h3><a href="/"><input type="image" src="/static/images/home.png" alt="Home" width="100" height="100"></a></h3>
+<hr>
+<table width=100%>
+  <tr>
+    <th rowspan="2">
+    <div id="hum_setPoint" style="font-size:200px;width:100%;">{{ hum_setPoint }}</div>
+    </th>
+    <td rowspan="2" style="font-size:150px;padding-right=10px">%
+    </td>
+    <td>
+      <form action="/hum_increase/" method="post"><button type="submit" name="increase" style="font-size:40px;">&#8679</button></form>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <form action="/hum_decrease/" method="POST"><button type="submit" name="decrease" style="font-size:40px;">&#8681</button></form>
+    </td>
+  </tr>
+</table>
+</object>
+</object>
+        <script>
+                var eventSource = new EventSource("/listen")
+
+                eventSource.addEventListener("message", function(e) {
+                        console.log(e.data)
+                }, false)
+
+                eventSource.addEventListener("online", function(e) {
+                        data = JSON.parse(e.data)
+                        document.querySelector("#hum_setPoint").innerText = data.hum_setPoint
+
+                }, true)
+        </script>
+
+</body>
+</html>
+

@@ -1,0 +1,110 @@
+
+<html>
+<head>
+<style>
+body {background-color: powderblue;}
+label {font-size: 30px;}
+input {font-size: 25px;}
+h2 {font-size: 30px;}
+h3 {font-size: 45px;}
+h1 {font-size: 50px;}
+</style>
+</head>
+<body>
+<h1><center>Settings</center></h1>
+<h3><a href="/"><input type="image" src="/static/images/home.png" alt="Home" width="100" height="100"></a></h3>
+<hr>
+<td><a href='/graph'><input type="image" src="/static/images/graph.png" alt="Graph" width="75" height="100"
+style="padding-right:60px;padding-left:40px"></a></td>
+<td><a href='/heatschedule'><input type="image" src="/static/images/heat_schedule.png" alt="HeatSchedule" width="100" height="100"
+style="padding-right:40px"></a></td>
+<td><a href='/coolschedule'><input type="image" src="/static/images/ac_schedule.png" alt="CoolSchedule" width="100" height="100"
+style="padding-right:40px"></a></td>
+<hr>
+	<h3> OpenWeatherMap Key: </h3>
+OpenWeatherMap is an api that grabs local weather data.  Go to https://home.openweathermap.org/users/sign_up to get an API Key.  Save the Key to your records and input it into the box below.<br>
+Then go to https://openweathermap.org and search your City.  If there is only one city shown use it.<br>  Otherwise find a different city nearby that has only one choice.  Sometimes city names are used all over the world.
+	<p><form method="POST" action="/key_settings">
+		<label for="owmKey">Enter Key:</label><label style="font-size:20px;" for="owmKey">(Set to 0 to disable)</label><br>
+		<input name="owmKey" size="32" value= "{{Key}}"><br>
+		<label for="owmCity">City Name:</label><br>
+		<input name="owmCity" size="25" value= "{{City}}"><br>
+		<label for="owmCountry">Two Letter Country Code:</label><br>
+		<input name="owmCountry" size="4" maxlength="4" value= "{{Country}}"><br>
+		<input type="submit" id="key">
+		</form></p>
+<hr>
+	<h3> Temperature Swing: </h3>
+<p>Temperature swing is the Temperature at which the Thermostat turns on and off outside the Setpoint.  Recommended no more that 2 degree swing.
+	</p><p><form method="POST" action="/cool_settings">
+		<label for="A/C Swing">A/C Swing:</label><br>
+		<input name="coolSwing" size="4" value= "{{swingcool}}">
+		<input type="submit">
+		</form></p>
+	<form method="POST" action="/heat_settings">
+		<label for="Heat Swing">Heat Swing:</label><br>
+		<input type="text" name="heatSwing" size="4" value= "{{swingheat}}">
+		<input type="submit">
+		</form></p>
+<hr>
+	<h2>Custom Links</h2>
+	<form action="/add_link" method="POST">
+    	<label>Link Name:</label><br>
+	    <input type="text" name="linkName" required><br><br>
+	    <label>Link Address:</label><br>
+    	<input type="text" name="linkUrl" placeholder="http://192.168.2.114" required><br><br>
+	    <input type="submit" value="Add Link">
+	</form>
+	<br>
+	{% for link in custom_links %}
+    	<div>
+        	<a href="{{ link[2] }}" target="_blank">
+            	{{ link[1] }}
+	        </a>
+	        <form action="/delete_link" method="POST" style="display:inline;">
+    	        <input type="hidden" name="id" value="{{ link[0] }}">
+        	    <input type="submit" value="Delete">
+	        </form>
+    	</div>
+	    <br>
+	{% endfor %}
+<hr>
+	<h3> Influx DB: </h3>
+	<p>If you want to Graph Inside and Outside Weather. Programmed to track temp_inside, hum_inside, setPoint, outtemperature, hum_local. Will need to reboot thermostat after changing.
+	<form method="POST" action="/influx_settings">
+		<label for="Influx DB IP">InfluxDB Server IP:</label><br>
+		<input name="influxIp" size="10" value= "{{ipinflux}}"><br>
+		<label for="Influx DB Name">InfluxDB Database Name:</label><br>
+		<input name="influxDatabase" size="10" value= "{{databaseinflux}}"><br>
+		<label for="Influx Username">InfluxDB Server Username:</label><br>
+		<input name="influxUsername" size="8"><br>
+		<label for="Influx Username">InfluxDB Server Password:</label><br>
+		<input name="influxPassword" size="8"><br>
+		<input type="submit">
+		</form></p>
+<hr>
+	<h3> MQTT: </h3>
+	<p>Can be used to control Furnace, Whole house Humidifier over wifi to ESP32. Will need to reboot thermostat.
+	<form method="POST" action="/mqtt_settings">
+		<label for="Mqtt Username">Mqtt Server Username:</label><br>
+		<input name="mqttUsername" size="8"><br>
+		<label for="Mqtt Username">Mqtt Server Password:</label><br>
+		<input name="mqttPassword" size="8"><br>
+		<input type="submit">
+		</form></p>
+<hr>
+	<h2> Reboot Thermostat: </h2>
+	<p>
+	<form method="POST" action="/reboot_settings">
+		<button type="submit" style="font-size:40px">Reboot</button>
+		</form></p>
+<hr>
+
+<p>
+There is a five minute delay programmed to make the Thermostat wait five minutes between when the furnace/air shuts off and when it can start again.
+</p>
+<hr>
+</object>
+</object>
+</body>
+</html>

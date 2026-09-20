@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<link rel="apple-touch-startup-image" href="/static/images/ajax-loader.gif">
+<link rel="icon" type="image/png" href="/static/images/favicon/favicon32.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Thermostat">
+<html>
+<head>
+    <link type="text/css" rel="stylesheet" href="static/styles.css" />
+
+ <h1 style="font-size:100px"><span style="color:Blue;"><center>PiTherm</span><span style="color:Red;">OS</span></center></h1>
+ 
+</head>
+<body>
+<table width=100%>
+<td><form action ="/heat/" name ="heat" method="post"><input type="image" id="flame_image" src="{{ flame_image }}" alt="Heat" width="100" height="100"
+style="padding-right:40px"></form>
+<!---<td><a href='/schedule'><input type="image" src="/static/images/heat.png" alt="Heat" width="100" height="100" style="padding-right:40px"></a></td>--->
+<td><form action ="/cool/" name ="cool" method="post"><input type="image" id="snow_image" src="{{ snow_image }}" alt="Cool" width="100" height="100"
+style="padding-right:40px"></form>
+<!--<td><a href='/schedule'><input type="image" src="/static/images/ac.png" alt="A/C" width="100" height="100"
+style="padding-right:40px"></a></td>-->
+<td><form action ="/fan/" name ="fan" method="post"><input type="image" id="fan_image" src="{{ fan_image }}" alt="Fan" width="80" height="80"
+style="padding-right:40px"></form>
+<!--<td><a href='/graph'><input type="image" src="/static/images/graph.png" alt="Graph" width="75" height="100"
+style="padding-right:40px"></a></td>-->
+<td><a href='/hum'><input type="image" id="hum_image" src="{{ hum_image }}" alt="Hum" width="100" height="100"
+style="padding-right:40px"></a></td>
+<td><a href='/settings'><input type="image" src="/static/images/settings.png" alt="Settings" width="100" height="100"></a></td>
+</table>
+<hr style="background-color:Black;">
+<table width=100%>
+  <tr>
+    <th rowspan="2">
+    <div id="setPoint" style="font-size:200px;width:100%;">{{ setPoint }}</div>
+    </th>
+    <td rowspan="2" style="font-size:150px;padding-right=10px">&deg;F
+    </td>
+    <td>
+      <form action="/increase/" name="increase" method="post"><button type="submit" name="increase" style="font-size:40px;">&#8679</a></button></form>
+    </td>
+    <td rowspan="2">
+<!--      <form action ="/hold/" name ="hold" method="post"><input type="image" src="/static/images/hold.png" alt="Hold" width="100" height="100"
+style="padding-right:10px"></form>-->
+      <form action ="/hold/" name ="hold" method="post"><input type="image" id="hold_image" src="{{ hold_image }}" alt="Hold" width="100" height="100"
+style="padding-right:10px"></form>
+    </td>
+    <td>
+      <div id="temp" style="font-size:100px;bottom:0;right:0;">{{ temp }}</div>
+    </td>
+    <td style="font-size:100px;float:left;">&deg;F</td>
+  </tr>
+  <tr>
+    <td>
+      <form action="/decrease/" method="POST"><button type="submit" name="decrease" method="post" style="font-size:40px;">&#8681</button></form>  
+    </td>
+    <td>
+    <div id="hum" style="font-size:100px">{{ hum }}</div>
+    </td>
+    <td style="font-size:100px;float:left;">%</td>
+  </tr>
+</table>
+  <center>
+    {% for link in custom_links %}
+        <a href="{{ link[1] }}" target="_blank" style="font-size:40px;">
+            {{ link[0] }}
+        </a><br>
+    {% endfor %}
+  </center>
+    {% if onWeather %}
+  <center><div class="out" style="font-size:40px;"><b>OutSide Weather</b></center></td></h4>
+<center><table width=35%>
+  <tr>
+    <th colspan="3">
+    <td><div class="out" id="outtemp" style="font-size:40px;right:0;">{{ outtemp }}</div></td>
+    <td style="font-size:40px;float:left;">&deg;F</td></th>
+    <th colspan="2" style="font-size:40px">&#10023
+    </th>
+    <th colspan="3">
+    <td><div class="out" id="outhum" style="font-size:40px;">{{ outhum }}</div></td>
+    <td style="font-size:40px;float:left;">%</td></th>
+    <th colspan="2" style="font-size:40px">&#10023
+    </th>
+    <th colspan="3">
+    <td><div class="out" id="outwind" style="font-size:40px;">{{ outwind }}</div></td>
+    <td style="font-size:40px;float:left;">Mph</td></th>
+  </tr>
+</center></table>
+  <center><div class="out" style="font-size:40px;"><b>Feels Like</b></center></td></h4>
+<center><table width=10%>
+  <tr>
+    <td><div class="out" id="feelslike" style="font-size:40px;right:0;">{{ feelslike  }}</div></td>
+    <td style="font-size:40px;float:left;">&deg;F</td>
+  </tr>
+</center></table>
+  <center><div class="out" style="font-size:40px;"><b>Max Temp</b></center></td></h4>
+<center><table width=10%>
+  <tr>
+    <td><div class="out" id="outtempmax" style="font-size:40px;right:0;">{{ outtempmax  }}</div></td>
+    <td style="font-size:40px;float:left;">&deg;F</td>
+  </tr>
+    {% endif %}
+</center></table>
+  <h4><center><div id="time" style="font-size:30px;">{{ time }}</center></div></h4>
+
+	<script>
+		var eventSource = new EventSource("/listen")
+
+		eventSource.addEventListener("message", function(e) {
+			console.log(e.data)
+		}, false)
+
+		eventSource.addEventListener("online", function(e) {
+			data = JSON.parse(e.data)
+			document.querySelector("#temp").innerText = data.temp
+			document.querySelector("#time").innerText = data.time
+			document.querySelector("#hum").innerText = data.hum
+			document.querySelector("#setPoint").innerText = data.setPoint
+			document.querySelector("#outtemp").innerText = data.outtemp
+			document.querySelector("#outtempmax").innerText = data.outtempmax
+			document.querySelector("#outhum").innerText = data.outhum
+			document.querySelector("#outwind").innerText = data.outwind
+			document.querySelector("#feelslike").innerText = data.feelslike
+			document.querySelector("#flame_image").src = data.flame_image
+			document.querySelector("#hold_image").src = data.hold_image
+			document.querySelector("#snow_image").src = data.snow_image
+			document.querySelector("#fan_image").src = data.fan_image
+			document.querySelector("#hum_image").src = data.hum_image
+			document.querySelector("#onWeather").innerText = data.onWeather
+
+		}, true)
+	</script>
+</body>
+</html>
+
+
