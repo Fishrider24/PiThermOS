@@ -1,0 +1,45 @@
+
+body {
+  background-color:
+DeepSkyBlue;
+}
+h1 {
+  font-size:
+1000;
+  text-align:
+center;
+}
+h2 {
+  font-size:
+1000%;
+  text-align:
+center;
+}    
+#temp {
+  float:
+right;
+  width:
+100%;
+  font-size:
+500%;
+  text-align:
+right;
+}
+#hum {
+  float:
+right;
+  width:
+100%;
+  font-size:
+500%;
+  text-align:
+right;
+}
+#time {
+  width:
+100%;
+  font-size:
+250%;
+  text-align:
+center;
+}
