@@ -50,3 +50,71 @@ http://www.lcdwiki.com/3.5inch_RPi_Display
 If no monitor is connected, you can test by connecting over VNC, opening a terminal window. 
 If the programs dont open, run python3 /PiThermOS/thermostatcontrol.py in a terminal window to see errors. Can do the same with python3 app.py in another terminal window.  
 For the webserver go to your pi's ip address:8080 and see the Browser window.  
+
+## License
+
+PiThermOS original source code is released under the MIT License.
+
+Copyright (c) 2026 Evan Potts
+
+See the [LICENSE](LICENSE) file for the complete license text.
+
+PiThermOS includes and uses third-party software and source code. Third-party
+components remain under their respective licenses. The PiThermOS MIT License
+does not replace or modify the licenses of third-party components.
+
+### Python and Python Libraries
+
+PiThermOS uses open-source software including:
+
+- Python
+- Flask
+- gevent
+- Paho MQTT Python Client
+- Matplotlib
+- SQLite
+- smbus
+
+Each component remains subject to its respective license.
+
+
+## Third-Party Software and Credits
+
+PiThermOS includes and uses third-party software and source code.
+Third-party components remain under their respective licenses.
+
+### Waveshare UPS / INA219 Code
+
+PiThermOS includes a modified version of the INA219 Python code
+originally provided by Waveshare as part of the Waveshare
+UPS-Power-Module project.
+
+Original source:
+https://github.com/waveshare/UPS-Power-Module/blob/master/ups_display/ina219.py
+
+Copyright (c) 2020 waveshare
+
+The original Waveshare code is licensed under the MIT License.
+The version included in PiThermOS has been modified for integration
+with PiThermOS, including UPS battery monitoring and automatic
+shutdown functionality.
+
+The Waveshare MIT License and copyright notice are retained for
+the portions derived from the original code.
+
+### Random Nerd Tutorials
+
+Parts of the PiThermOS ESP32 MQTT code are based on the
+"ESP32 MQTT – Publish and Subscribe with Arduino IDE" tutorial
+by Rui Santos / Random Nerd Tutorials.
+
+Original source:
+https://randomnerdtutorials.com/esp32-mqtt-publish-subscribe-arduino-ide/
+
+The original code was modified substantially for use with PiThermOS,
+including thermostat control, MQTT topics, GPIO assignments,
+and other PiThermOS-specific functionality.
+
+Original code is provided under the terms stated in the source
+project. The original attribution and applicable license terms
+are retained.
