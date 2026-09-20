@@ -1,0 +1,18 @@
+#Instructions- pip3 freeze > requirements.txt ~to make file
+# pip3 install -r requirements.txt ~both from folder you want #requirements file to be made and ran from.
+#Flask==1.0.2         #*might need
+gevent==21.1.2       #*
+influxdb==5.3.1      #*
+#Jinja2==2.10         #*might need
+matplotlib==3.4.0    #*
+numpy==1.20.2        #*
+paho-mqtt==1.6.1     #*
+pyowm==3.2.0         #*
+#pyserial==3.4        #*might need
+RPi.bme280==0.2.3    #*
+smbus2==0.4.1        #*
+tkinterhtml==0.7     #*
+
+#sudo apt-get install libatlas-base-dev
+#add therm.desktop and web.desktop to /home/pi/.config/autostart
+#must make an autostart folder.  add ups.desktop if using a ups
