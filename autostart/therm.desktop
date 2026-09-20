@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=therm.desktop
+Type=Application
+Comment=My Thermostat
+Exec=/usr/bin/python3 /home/pi/PiThermOS/thermostatcontrol.py

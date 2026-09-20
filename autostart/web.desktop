@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=web.desktop
+Type=Application
+Comment=ThermWeb
+Exec=/usr/bin/python3 /home/pi/PiThermOS/app.py

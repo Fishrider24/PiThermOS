@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=ups.desktop
+Type=Application
+Comment=Battery
+Exec=/usr/bin/python3 /home/pi/PiThermOS/ups.py
