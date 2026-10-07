@@ -218,8 +218,8 @@ def index():
 		setPoint = getSetpoint()
 		return render_template('index.html', feelslike=feelslike, outtemp=outtemp, outtempmax=outtempmax, outhum=outhum, outwind=outwind, temp=temp, hum_image=hum_image, flame_image=flame_image, snow_image=snow_image, hold_image=hold_image, fan_image=fan_image, time=timeString, hum=hum, setPoint=setPoint, onWeather=onWeather, custom_links=custom_links)
 	except Exception as e:
-    	print("INDEX ERROR:", e)
-    	return str(e), 500
+		print("INDEX ERROR:", e)
+		return str(e), 500
 
 		#######################
 
