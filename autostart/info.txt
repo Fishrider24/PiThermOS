@@ -1,1 +1,1 @@
-Autostart files, so thermostat and webapp start on boot
+Autostart files, so thermostat, ups and webapp start on boot. Edit out ups if not using.
