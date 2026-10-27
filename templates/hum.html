@@ -1,7 +1,7 @@
 <html>
 <head>
 <style>
-body {background-color: powderblue;}
+body {background-color: DeepSkyBlue;}
 </style>
 </head>
 <body>
@@ -25,6 +25,17 @@ body {background-color: powderblue;}
     </td>
   </tr>
 </table>
+<center>
+    <form action="/hum_toggle/" method="POST">
+        <button type="submit" style="font-size:40px;">
+            {% if humidifier == 1 %}
+                Humidifier Enabled
+            {% else %}
+                Humidifier Disabled
+            {% endif %}
+        </button>
+    </form>
+</center>
 </object>
 </object>
         <script>

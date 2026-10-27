@@ -2,7 +2,7 @@
 <html>
 <head>
 <style>
-body {background-color: powderblue;}
+body {background-color: DeepSkyBlue;}
 label {font-size: 30px;}
 input {font-size: 25px;}
 h2 {font-size: 30px;}
@@ -12,9 +12,9 @@ h1 {font-size: 50px;}
 </head>
 <body>
 <h1><center>Settings</center></h1>
-<h3><a href="/"><input type="image" src="/static/images/home.png" alt="Home" width="100" height="100"></a></h3>
+<h3><a href="/"><input type="image" src="/static/images/home.png" alt="Home" width="100" height="100" style="padding-left:40px"></a></h3>
 <hr>
-<td><a href='/graph'><input type="image" src="/static/images/graph.png" alt="Graph" width="75" height="100"
+<td><a href='/graph'><input type="image" src="/static/images/graph.png" alt="Graph" width="100" height="100"
 style="padding-right:60px;padding-left:40px"></a></td>
 <td><a href='/heatschedule'><input type="image" src="/static/images/heat_schedule.png" alt="HeatSchedule" width="100" height="100"
 style="padding-right:40px"></a></td>
@@ -34,6 +34,16 @@ Then go to https://openweathermap.org and search your City.  If there is only on
 		<input type="submit" id="key">
 		</form></p>
 <hr>
+	<h3> Temperature Units: </h3>
+	<form method="POST" action="/temp_unit_settings">
+		<label for="tempUnit">Temperature Unit:</label><br>
+		<select name="tempUnit" id="tempUnit" style="font-size:25px;">
+			<option value="F" {% if tempUnit == 'F' %}selected{% endif %}>Fahrenheit (°F)</option>
+			<option value="C" {% if tempUnit == 'C' %}selected{% endif %}>Celsius (°C)</option>
+		</select>
+		<input type="submit" value="Save">
+	</form>
+<hr>
 	<h3> Temperature Swing: </h3>
 <p>Temperature swing is the Temperature at which the Thermostat turns on and off outside the Setpoint.  Recommended no more that 2 degree swing.
 	</p><p><form method="POST" action="/cool_settings">
@@ -52,7 +62,7 @@ Then go to https://openweathermap.org and search your City.  If there is only on
     	<label>Link Name:</label><br>
 	    <input type="text" name="linkName" required><br><br>
 	    <label>Link Address:</label><br>
-    	<input type="text" name="linkUrl" placeholder="http://192.168.2.114" required><br><br>
+    	<input type="text" name="linkUrl" placeholder="http://www.github.com" required><br><br>
 	    <input type="submit" value="Add Link">
 	</form>
 	<br>
@@ -86,8 +96,12 @@ Then go to https://openweathermap.org and search your City.  If there is only on
 	<h3> MQTT: </h3>
 	<p>Can be used to control Furnace, Whole house Humidifier over wifi to ESP32. Will need to reboot thermostat.
 	<form method="POST" action="/mqtt_settings">
+		<label for="mqttHost">MQTT Broker Address:</label><br>
+		<input type="text" id="mqttHost" name="mqttHost" value="{{ mqttHost }}"><br>
+		<label for="mqttPort">MQTT Broker Port:</label><br>
+		<input type="number" id="mqttPort" name="mqttPort" value="{{ mqttPort }}" min="1" max="65535"><br>
 		<label for="Mqtt Username">Mqtt Server Username:</label><br>
-		<input name="mqttUsername" size="8"><br>
+		<input name="mqttUsername" size="8" autocomplete="off"><br>
 		<label for="Mqtt Username">Mqtt Server Password:</label><br>
 		<input name="mqttPassword" size="8"><br>
 		<input type="submit">

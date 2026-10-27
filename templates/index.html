@@ -20,9 +20,9 @@ style="padding-right:40px"></form>
 style="padding-right:40px"></form>
 <!--<td><a href='/schedule'><input type="image" src="/static/images/ac.png" alt="A/C" width="100" height="100"
 style="padding-right:40px"></a></td>-->
-<td><form action ="/fan/" name ="fan" method="post"><input type="image" id="fan_image" src="{{ fan_image }}" alt="Fan" width="80" height="80"
+<td><form action ="/fan/" name ="fan" method="post"><input type="image" id="fan_image" src="{{ fan_image }}" alt="Fan" width="100" height="100"
 style="padding-right:40px"></form>
-<!--<td><a href='/graph'><input type="image" src="/static/images/graph.png" alt="Graph" width="75" height="100"
+<!--<td><a href='/graph'><input type="image" src="/static/images/graph.png" alt="Graph" width="100" height="100"
 style="padding-right:40px"></a></td>-->
 <td><a href='/hum'><input type="image" id="hum_image" src="{{ hum_image }}" alt="Hum" width="100" height="100"
 style="padding-right:40px"></a></td>
@@ -32,27 +32,26 @@ style="padding-right:40px"></a></td>
 <table width=100%>
   <tr>
     <th rowspan="2">
-    <div id="setPoint" style="font-size:200px;width:100%;">{{ setPoint }}</div>
+    <div id="setPoint" style="font-size:200px;width:100%;">{% if tempUnit == 'C' %}{{ "%.1f"|format(setPoint|float) }}{% else %}{{ "%.0f"|format(setPoint|float) }}{% endif %}</div>
     </th>
-    <td rowspan="2" style="font-size:150px;padding-right=10px">&deg;F
-    </td>
+    <td rowspan="2" style="font-size:{% if tempUnit == 'C' %}100px{% else %}150px{% endif %};padding-right:10px">&deg;{{ tempUnit }}</td>
     <td>
-      <form action="/increase/" name="increase" method="post"><button type="submit" name="increase" style="font-size:40px;">&#8679</a></button></form>
+      <form action="/increase/" name="increase" method="post"><button type="submit" name="increase" style="font-size:50px;width: 100%">&#8679;&#xFE0E</a></button></form>
     </td>
     <td rowspan="2">
 <!--      <form action ="/hold/" name ="hold" method="post"><input type="image" src="/static/images/hold.png" alt="Hold" width="100" height="100"
-style="padding-right:10px"></form>-->
+style="padding-right:10px;padding-left:30px"></form>-->
       <form action ="/hold/" name ="hold" method="post"><input type="image" id="hold_image" src="{{ hold_image }}" alt="Hold" width="100" height="100"
-style="padding-right:10px"></form>
+style="padding-right:10px;padding-left:30px"></form>
     </td>
     <td>
       <div id="temp" style="font-size:100px;bottom:0;right:0;">{{ temp }}</div>
     </td>
-    <td style="font-size:100px;float:left;">&deg;F</td>
+    <td style="font-size:100px;float:left;">&deg;{{ tempUnit }}</td>
   </tr>
   <tr>
     <td>
-      <form action="/decrease/" method="POST"><button type="submit" name="decrease" method="post" style="font-size:40px;">&#8681</button></form>  
+      <form action="/decrease/" method="POST"><button type="submit" name="decrease" method="post" style="font-size:50px;width: 100%">&#8681;&#xFE0E</button></form>  
     </td>
     <td>
     <div id="hum" style="font-size:100px">{{ hum }}</div>
@@ -60,6 +59,8 @@ style="padding-right:10px"></form>
     <td style="font-size:100px;float:left;">%</td>
   </tr>
 </table>
+<br>
+<br>
   <center>
     {% for link in custom_links %}
         <a href="{{ link[1] }}" target="_blank" style="font-size:40px;">
@@ -73,7 +74,7 @@ style="padding-right:10px"></form>
   <tr>
     <th colspan="3">
     <td><div class="out" id="outtemp" style="font-size:40px;right:0;">{{ outtemp }}</div></td>
-    <td style="font-size:40px;float:left;">&deg;F</td></th>
+    <td style="font-size:40px;float:left;">&deg;{{ tempUnit }}</td></th>
     <th colspan="2" style="font-size:40px">&#10023
     </th>
     <th colspan="3">
@@ -90,14 +91,7 @@ style="padding-right:10px"></form>
 <center><table width=10%>
   <tr>
     <td><div class="out" id="feelslike" style="font-size:40px;right:0;">{{ feelslike  }}</div></td>
-    <td style="font-size:40px;float:left;">&deg;F</td>
-  </tr>
-</center></table>
-  <center><div class="out" style="font-size:40px;"><b>Max Temp</b></center></td></h4>
-<center><table width=10%>
-  <tr>
-    <td><div class="out" id="outtempmax" style="font-size:40px;right:0;">{{ outtempmax  }}</div></td>
-    <td style="font-size:40px;float:left;">&deg;F</td>
+    <td style="font-size:40px;float:left;">&deg;{{ tempUnit }}</td>
   </tr>
     {% endif %}
 </center></table>
@@ -117,7 +111,6 @@ style="padding-right:10px"></form>
 			document.querySelector("#hum").innerText = data.hum
 			document.querySelector("#setPoint").innerText = data.setPoint
 			document.querySelector("#outtemp").innerText = data.outtemp
-			document.querySelector("#outtempmax").innerText = data.outtempmax
 			document.querySelector("#outhum").innerText = data.outhum
 			document.querySelector("#outwind").innerText = data.outwind
 			document.querySelector("#feelslike").innerText = data.feelslike
