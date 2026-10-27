@@ -30,12 +30,16 @@ def getCurrent():
 			celsius_format = "{:.2f}".format(ambient_temp)
 			fahrenheit_convert = float(celsius_format) * 9.0 / 5.0 + 32
 			fahrenheit_format = "{:.1f}".format(fahrenheit_convert)
+			from database import getTempUnit
+			temp_unit = getTempUnit()
+			if temp_unit == "C":
+				temp_format = celsius_format
+			else:
+				temp_format = fahrenheit_format
 			conn=sqlite3.connect(sensors_path)
 			curs=conn.cursor()
 			curs.execute("CREATE TABLE IF NOT EXISTS sensors (timestamp DATETIME, temp NUMERIC, hum NUMERIC)")
-#	~~For Celsius comment out the next line and uncomment the line after~~
-			curs.execute("INSERT INTO sensors values(datetime('now', 'localtime'), (?), (?))", (fahrenheit_format, humid))
-#			curs.execute("INSERT INTO sensors values(datetime('now', 'localtime'), (?), (?))", (celsius_format, humid))
+			curs.execute("INSERT INTO sensors values(datetime('now', 'localtime'), (?), (?))", (temp_format, humid))
 			curs.execute('SELECT COUNT(*) from sensors')
 			curs_result = curs.fetchone()
 			rows = curs_result[0]
@@ -45,6 +49,6 @@ def getCurrent():
 			curs.close()
 			conn.close()
 			time.sleep(1)
-			return
+			return True
 		except:
-			return
+			return False

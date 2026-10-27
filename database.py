@@ -1,3 +1,4 @@
+
 #!/usr/bin/python
 import datetime
 import threading
@@ -27,6 +28,8 @@ def getDatabase():
 		setPoint_set=curs.fetchone()
 		if setPoint_set == None:
 			curs.execute("INSERT OR REPLACE INTO setPoint (id, setPoint) values ('1', '65')")
+		curs.execute("CREATE TABLE IF NOT EXISTS tempUnit (id INTEGER PRIMARY KEY, unit TEXT)")
+		curs.execute("INSERT OR IGNORE INTO tempUnit (id, unit) VALUES (1, 'F')")
 		curs.execute("CREATE TABLE IF NOT EXISTS owmKey (id INTEGER PRIMARY KEY, owmKey, owmCity, owmCountry)")
 		curs.execute("SELECT owmKey from owmKey")
 		owmKey_set=curs.fetchone()
@@ -77,6 +80,11 @@ def getDatabase():
 		fan_set=curs.fetchone()
 		if fan_set == None:
 			curs.execute("INSERT OR REPLACE INTO fan (id, fan) values ('1', '0')")
+		curs.execute("CREATE TABLE IF NOT EXISTS humidifier (id INTEGER PRIMARY KEY, humidifier NUMERIC)")
+		curs.execute("SELECT humidifier from humidifier")
+		humidifier_set=curs.fetchone()
+		if humidifier_set == None:
+			curs.execute("INSERT OR REPLACE INTO humidifier (id, humidifier) values ('1', '0')")
 		curs.execute("CREATE TABLE IF NOT EXISTS hum (id INTEGER PRIMARY KEY, hum NUMERIC)")
 		curs.execute("SELECT hum from hum")
 		hum_set=curs.fetchone()
@@ -102,7 +110,7 @@ def getDatabase():
 		influxIp_set=curs.fetchone()
 		if influxIp_set == None:
 			curs.execute("INSERT OR REPLACE INTO influxIp (id, influxIp, influxDatabase, influxUsername, influxPassword) values ('1', '0', 'thermostat', 'admin', 'password')")
-		curs.execute("CREATE TABLE IF NOT EXISTS mqtt (id INTEGER PRIMARY KEY, mqttUser, mqttPass)")
+		curs.execute("CREATE TABLE IF NOT EXISTS mqtt (id INTEGER PRIMARY KEY, mqttUser, mqttPass, mqttHost TEXT DEFAULT 'localhost', mqttPort INTEGER DEFAULT 1883)")
 		curs.execute("SELECT mqttUser from mqtt")
 		mqtt_set=curs.fetchone()
 		if mqtt_set == None:
@@ -128,11 +136,6 @@ def getDatabase():
 		outtemp_set=curs.fetchone()
 		if outtemp_set == None:
 			curs.execute("INSERT OR REPLACE INTO outtemp (id, temp) values ('1', '0')")
-		curs.execute("CREATE TABLE IF NOT EXISTS outtempmax (id INTEGER PRIMARY KEY, tempmax NUMERIC DEFAULT (0))")
-		curs.execute("SELECT tempmax from outtempmax")
-		outtempmax_set=curs.fetchone()
-		if outtempmax_set == None:
-			curs.execute("INSERT OR REPLACE INTO outtempmax (id, tempmax) values ('1', '0')")
 		curs.execute("CREATE TABLE IF NOT EXISTS outwind (id INTEGER PRIMARY KEY, wind NUMERIC DEFAULT (0))")
 		curs.execute("SELECT wind from outwind")
 		outwind_set=curs.fetchone()
@@ -155,6 +158,34 @@ def getDatabase():
 		return
 	except:
 		return
+
+#       ~~Get Temperature Unit from Database~~
+def getTempUnit():
+        try:
+                conn=sqlite3.connect(settings_path)
+                curs=conn.cursor()
+                curs.execute("SELECT unit FROM tempUnit WHERE id=1")
+                unit=curs.fetchone()[0]
+                curs.close()
+                conn.close()
+                return unit
+        except:
+                return "F"
+
+#       ~~Set Temperature Unit in Database~~
+def setTempUnit(unit):
+        try:
+                if unit not in ("F", "C"):
+                        return
+                conn=sqlite3.connect(settings_path)
+                curs=conn.cursor()
+                curs.execute("INSERT OR REPLACE INTO tempUnit (id, unit) values (1, ?)", (unit,))
+                conn.commit()
+                curs.close()
+                conn.close()
+                return
+        except:
+                return
 
 #		~~Get Heat Weekday Schedule from Database~~
 def getheatScheduleweekday():
@@ -299,34 +330,36 @@ def getSetpoint():
 	except:
 		return
 
-#		~~Add 1 to Setpoint~~
 def upSetpoint():
-	try:
-		setPoint = getSetpoint()
-		add1 = int(setPoint) + 1
-		conn=sqlite3.connect(settings_path)
-		curs=conn.cursor()
-		curs.execute("INSERT OR REPLACE INTO setPoint (id, setPoint) values ('1', ?)", (add1,))
-		conn.commit()
-		curs.close()
-		conn.close()
-		return
-	except:
-		return
-#		~~Subtract 1 from Setpoint~~
+        try:
+                setPoint = float(getSetpoint())
+                increment = 0.5 if getTempUnit() == "C" else 1
+                add1 = round(setPoint + increment, 2)
+                conn=sqlite3.connect(settings_path)
+                curs=conn.cursor()
+                curs.execute("INSERT OR REPLACE INTO setPoint (id, setPoint) values ('1', ?)", (add1,))
+                conn.commit()
+                curs.close()
+                conn.close()
+                return
+        except:
+                return
+
+#               ~~Subtract 1 from Setpoint~~
 def downSetpoint():
-	try:
-		setPoint = getSetpoint()
-		sub1 = int(setPoint) - 1
-		conn=sqlite3.connect(settings_path)
-		curs=conn.cursor()
-		curs.execute("INSERT OR REPLACE INTO setPoint (id, setPoint) values ('1', ?)", (sub1,))
-		conn.commit()
-		curs.close()
-		conn.close()
-		return
-	except:
-		return
+        try:
+                setPoint = float(getSetpoint())
+                increment = 0.5 if getTempUnit() == "C" else 1
+                sub1 = round(setPoint - increment, 2)
+                conn=sqlite3.connect(settings_path)
+                curs=conn.cursor()
+                curs.execute("INSERT OR REPLACE INTO setPoint (id, setPoint) values ('1', ?)", (sub1,))
+                conn.commit()
+                curs.close()
+                conn.close()
+                return
+        except:
+                return
 
 #		~~Get owmKey from Database~~
 def getowmKey():
@@ -382,14 +415,55 @@ def getMqtt():
 	try:
 		conn=sqlite3.connect(settings_path)
 		curs=conn.cursor()
-		curs.execute("SELECT * from mqtt")
+		curs.execute("SELECT mqttUser, mqttPass, mqttHost, mqttPort FROM mqtt WHERE id=1")
 		Mqtt=curs.fetchone()
-		mqttUser=Mqtt[1]
-		mqttPass=Mqtt[2]
+		mqttUser=Mqtt[0]
+		mqttPass=Mqtt[1]
+		mqttHost=Mqtt[2]
+		mqttPort=Mqtt[3]
+		curs.close()
+		conn.close()
+		return mqttUser, mqttPass, mqttHost, mqttPort
+	except:
+		return
+
+#		~~Get humidifier Value from Database~~
+def getHumidifier():
+	try:
+		conn=sqlite3.connect(settings_path)
+		curs=conn.cursor()
+		curs.execute("SELECT humidifier from humidifier")
+		humidifier=curs.fetchone()[0]
 		conn.commit()
 		curs.close()
 		conn.close()
-		return mqttUser, mqttPass
+		return humidifier
+	except:
+		return
+
+#		~~Turn Humidifier On~~
+def onHumidifier():
+	try:
+		conn=sqlite3.connect(settings_path)
+		curs=conn.cursor()
+		curs.execute("INSERT OR REPLACE INTO humidifier (id, humidifier) values ('1', ?)", (1,))
+		conn.commit()
+		curs.close()
+		conn.close()
+		return
+	except:
+		return
+
+#		~~Turn Humidifier Off~~
+def offHumidifier():
+	try:
+		conn=sqlite3.connect(settings_path)
+		curs=conn.cursor()
+		curs.execute("INSERT OR REPLACE INTO humidifier (id, humidifier) values ('1', ?)", (0,))
+		conn.commit()
+		curs.close()
+		conn.close()
+		return
 	except:
 		return
 
@@ -836,6 +910,25 @@ def offFanenable():
 	except:
 		return
 
+#		~~Check sensor reading timestamp for stale reading~~
+def sensor_reading_fresh():
+    try:
+        conn = sqlite3.connect(sensors_path)
+        curs = conn.cursor()
+        curs.execute("SELECT timestamp FROM sensors ORDER BY rowid DESC LIMIT 1")
+        current = curs.fetchone()
+        curs.close()
+        conn.close()
+        if current is None:
+            return False
+        curs_timestamp = datetime.datetime.strptime(
+            current[0], "%Y-%m-%d %H:%M:%S"
+        )
+        age = (datetime.datetime.now() - curs_timestamp).total_seconds()
+        return 0 <= age <= 60
+    except:
+        return False
+
 #		~~Get Inside Temperature and Humidity~~
 def getInside():
 	try:
@@ -859,8 +952,6 @@ def getOutside():
 		curs=conn.cursor()
 		curs.execute("SELECT temp from outtemp")
 		outtemp=curs.fetchone()[0]
-		curs.execute("SELECT tempmax from outtempmax")
-		outtempmax=curs.fetchone()[0]
 		curs.execute("SELECT wind from outwind")
 		outwind=curs.fetchone()[0]
 		curs.execute("SELECT hum from outhum")
@@ -869,7 +960,7 @@ def getOutside():
 		feelslike=curs.fetchone()[0]
 		curs.close()
 		conn.close()
-		return outtemp, outtempmax, outwind, outhum, feelslike
+		return outtemp, outwind, outhum, feelslike
 	except:
 		return
 

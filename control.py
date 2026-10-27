@@ -85,7 +85,7 @@ def timeoutcool():
                 seconds = seconds - 1
                 time.sleep(1)
                 if cool_status == "Off":
-                    break
+                    return
             ac_timeout = "On"
             hvackill()
             break
@@ -116,7 +116,7 @@ def timeoutheat():
                 seconds = seconds - 1
                 time.sleep(1)
                 if heat_status == "Off":
-                    break
+                    return
             heat_timeout = "On"
             print('timeout')
             hvackill()

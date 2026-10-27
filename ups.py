@@ -14,7 +14,7 @@
 # PiThermOS modifications include integration with the thermostat
 # system and automatic Raspberry Pi shutdown based on UPS battery level.
 
-import smbus
+import smbus2 as smbus
 import time
 from subprocess import call
 

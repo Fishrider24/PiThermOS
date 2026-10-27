@@ -3,7 +3,6 @@ from flask import Flask, render_template, Response, stream_with_context, url_for
 from gevent.pywsgi import WSGIServer
 import datetime
 import threading
-import paho.mqtt.client as mqtt
 import time
 import json
 import os
@@ -129,7 +128,7 @@ def plot_temp():
 		ys = temps
 		axis = plt.subplot(1, 1, 1)
 		axis.clear()
-		axis.set_title("Temperature [°F]", fontsize=20)
+		axis.set_title("Temperature [°{}]".format(getTempUnit()), fontsize=20)
 		axis.set_xlabel("Samples", fontsize=20)
 		axis.grid(True)
 		xs2 = times
@@ -172,7 +171,7 @@ def index():
 	try:
 		global hum, temp, time, setPoint, outSide
 		time.sleep(1)
-		outtemp, outtempmax, outwind, outhum, feelslike = getOutside()
+		outtemp, outwind, outhum, feelslike = getOutside()
 		heaton = getHeat()
 		heatrun = getHeatrun()
 		owmKey, owmCity, owmCountry = getowmKey()
@@ -216,7 +215,8 @@ def index():
 		timeString = now.strftime("%A %-I:%M %p")
 		temp, hum = getInside()
 		setPoint = getSetpoint()
-		return render_template('index.html', feelslike=feelslike, outtemp=outtemp, outtempmax=outtempmax, outhum=outhum, outwind=outwind, temp=temp, hum_image=hum_image, flame_image=flame_image, snow_image=snow_image, hold_image=hold_image, fan_image=fan_image, time=timeString, hum=hum, setPoint=setPoint, onWeather=onWeather, custom_links=custom_links)
+		tempUnit = getTempUnit()
+		return render_template('index.html', feelslike=feelslike, outtemp=outtemp, outhum=outhum, outwind=outwind, temp=temp, hum_image=hum_image, flame_image=flame_image, snow_image=snow_image, hold_image=hold_image, fan_image=fan_image, time=timeString, hum=hum, setPoint=setPoint, tempUnit=tempUnit, onWeather=onWeather, custom_links=custom_links)
 	except Exception as e:
 		print("INDEX ERROR:", e)
 		return str(e), 500
@@ -245,11 +245,27 @@ def decrease():
 def hum():
 	try:
 		hum_setPoint = getHum()
-		return render_template('hum.html', hum_setPoint=hum_setPoint)
+		humidifier = getHumidifier()
+		return render_template('hum.html', hum_setPoint=hum_setPoint, humidifier=humidifier)
 	except:
 		return
 
 		#######################
+
+
+@app.route("/hum_toggle/", methods=['POST'])
+def hum_toggle():
+	try:
+		humidifier = getHumidifier()
+		if humidifier == 1:
+			offHumidifier()
+		else:
+			onHumidifier()
+		return redirect(url_for('hum'))
+	except:
+		return
+
+                #######################
 
 @app.route("/hum_increase/", methods=['POST'])
 def hum_increase():
@@ -413,12 +429,19 @@ def settings():
 			databaseinflux = row[2]
 		curs.execute("SELECT id, name, url FROM customLinks ORDER BY id")
 		custom_links = curs.fetchall()
+		curs.execute("SELECT mqttHost, mqttPort FROM mqtt WHERE id=1")
+		mqtt_settings = curs.fetchone()
+		mqttHost = mqtt_settings[0]
+		mqttPort = mqtt_settings[1]
 		conn.commit()
 		curs.close()
 		conn.close()
-		return render_template('settings.html', Key=Key, City=City, Country=Country, swingcool=swingcool, swingheat=swingheat, ipinflux=ipinflux, databaseinflux=databaseinflux, custom_links=custom_links)
-	except:
-		return
+		tempUnit = getTempUnit()
+		return render_template('settings.html', Key=Key, City=City, Country=Country, swingcool=swingcool, swingheat=swingheat, ipinflux=ipinflux, databaseinflux=databaseinflux, custom_links=custom_links, tempUnit=tempUnit, mqttHost=mqttHost, mqttPort=mqttPort)
+	except Exception as e:
+		app.logger.exception("Settings page failed")
+		return str(e), 500
+#		return
 
 		#######################
 
@@ -484,6 +507,17 @@ def owm_post():
 
 		###########################
 
+@app.route('/temp_unit_settings', methods=['POST'])
+def temp_unit_post():
+        try:
+                unit = request.form['tempUnit']
+                setTempUnit(unit)
+                return redirect(url_for('settings'))
+        except:
+                return redirect(url_for('settings'))
+
+                ###########################
+
 @app.route('/cool_settings', methods=['POST'])
 def cool_swing_post():
 	try:
@@ -511,7 +545,7 @@ def heat_swing_post():
 		curs.close()
 		conn.close()
 		return redirect(url_for('settings'))
-	except:
+	except: 
 		return
 
 		###########################
@@ -540,17 +574,24 @@ def mqtt_post():
 	try:
 		username = request.form['mqttUsername']
 		password = request.form['mqttPassword']
+		host = request.form['mqttHost']
+		port = int(request.form['mqttPort'])
+		if not 1 <= port <= 65535:
+			raise ValueError("Invalid MQTT port")
 		conn=sqlite3.connect(settings_path)
 		curs=conn.cursor()
-		curs.execute("INSERT OR REPLACE INTO mqtt (id, mqttUser, mqttPass) values (1, ?, ?)", (username, password))
+		curs.execute(
+			"UPDATE mqtt SET mqttUser=?, mqttPass=?, mqttHost=?, mqttPort=? WHERE id=1",
+			(username, password, host, port)
+		)
 		conn.commit()
 		curs.close()
 		conn.close()
 		return redirect(url_for('settings'))
-	except:
+	except Exception:
 		if logging:
 			logging.warning('mqtt_post')
-		return
+		return "Invalid MQTT settings", 400
 
 		###########################
 
@@ -568,7 +609,7 @@ def reboot_start():
 def reboot():
 	while True:
 		time.sleep(5)
-		os.system('sudo reboot')
+		os.system('sudo /usr/bin/systemctl reboot')
 
 		###########################
 
@@ -638,7 +679,7 @@ def listen():
 				time.sleep(2)
 				now = datetime.datetime.now()
 				timenow = now.strftime("%A %-I:%M %p")
-				outtemp, outtempmax, outwind, outhum, feelslike = getOutside()
+				outtemp, outwind, outhum, feelslike = getOutside()
 				heaton = getHeat()
 				heatrun = getHeatrun()
 				if heaton == 1:
@@ -675,7 +716,7 @@ def listen():
 				temp, hum = getInside()
 				setPoint = getSetpoint()
 				hum_setPoint = getHum()
-				_data = json.dumps({"temp":temp, "time":timenow, "feelslike":feelslike, "outtemp":outtemp, "outtempmax":outtempmax, "outwind":outwind, "outhum":outhum, "hum":hum, "setPoint":setPoint, "hum_setPoint":hum_setPoint, "hum_image":hum_image, "flame_image":flame_image, "snow_image":snow_image, "hold_image":hold_image, "fan_image":fan_image})
+				_data = json.dumps({"temp":temp, "time":timenow, "feelslike":feelslike, "outtemp":outtemp, "outwind":outwind, "outhum":outhum, "hum":hum, "setPoint":setPoint, "hum_setPoint":hum_setPoint, "hum_image":hum_image, "flame_image":flame_image, "snow_image":snow_image, "hold_image":hold_image, "fan_image":fan_image})
 				yield f"id: 1\ndata: {_data}\nevent: online\n\n"
 			except:
 				return
