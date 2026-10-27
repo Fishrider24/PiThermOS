@@ -25,7 +25,7 @@ Install the operating system with ssh access and user as pi.
 
 1. sudo apt update then sudo apt upgrade
 2. sudo raspi-config enable Spi, I2C and VNC in Interface Options and Disable Screen Blanking in Display Options.
-3. sudo apt install git
+3. sudo apt install git and sudo apt install -y fontconfig fonts-quicksand fonts-liberation
 4. cd /home/pi then git clone https://github.com/Fishrider24/PiThermOS.git
 5. Create a Virtual Environment to run the program in.
 cd /home/pi/PiThermOS then python3 -m venv --system-site-packages venv
