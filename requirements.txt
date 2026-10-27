@@ -1,18 +1,12 @@
-#Instructions- pip3 freeze > requirements.txt ~to make file
-# pip3 install -r requirements.txt ~both from folder you want #requirements file to be made and ran from.
-#Flask==1.0.2        #This comes from the Debian install
+#Flask==2.2.2        #This comes from the Debian install
 gevent==23.9.0.post1      #*
 influxdb==5.3.2      #*
-#Jinja2==2.10        #This comes from the Debian install
+#Jinja2==3.1.2       #This comes from the Debian install
 matplotlib==3.7.5    #*
 numpy==1.24.4        #*
 paho-mqtt==1.6.1     #*
 pyowm==3.3.0         #*
-#pyserial==3.4       #This comes from the Debian install
+#pyserial==3.5       #This comes from the Debian install
 RPi.bme280==0.2.4    #*
 smbus2==0.5.0        #*
 tkinterhtml==0.7     #*
-
-#sudo apt-get install libatlas-base-dev
-#add therm.desktop and web.desktop to /home/pi/.config/autostart
-#must make an autostart folder.  add ups.desktop if using a ups
