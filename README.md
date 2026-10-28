@@ -4,7 +4,7 @@ Updated for Bookworm Lite Legacy 64 bit with no desktop.  Moved some threads out
 Found if you use wifi on channel 1, wifi will drop out and lockout.  I switched my wifi channel to 11 and have very few issues.
 What I used: Raspberry Pi Zero2W, 3.5" 320x480 touchscreen, Pi Zero UPS Hat, BME280 humidity and temp board, esp-32S, G3MB-202P solid state relays.
 
-Touchscreen and Webpage view.<img src="https://github.com/Fishrider24/PiThermOS/blob/main/screenshots/touchscreen.png" width="200">
+Touchscreen and Webpage view.<img src="https://github.com/Fishrider24/PiThermOS/blob/main/screenshots/touchscreen.png" width="400">
 
 <img src="https://github.com/Fishrider24/PiThermOS/blob/main/screenshots/thermweb.PNG" width="200">
 
