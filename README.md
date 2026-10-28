@@ -20,24 +20,36 @@ Humidifier setting.
 
 <img src="https://github.com/Fishrider24/PiThermOS/blob/main/screenshots/thermhum.PNG" width="200">
 
-Pins used:
-Physical pin	Function	  Purpose      ##Relays
-    36	         Fan	    HVAC fan relay
-    38	         AC	      Air-conditioning relay
-    40	         Heater	  Heating relay
-    32	         ESP32 feedback	Feedback signal from the ESP32
-Physical pin	GPIO / function	Purpose  ##Touchscreen
-    19	      GPIO10 / MOSI	SPI display data
-    23	      GPIO11 / SCLK	SPI clock
-    24	      GPIO8 / CE0	SPI chip select for display
-    16	      GPIO23	Display reset
-    18	      GPIO24	Display data/command
-    22	      GPIO25	Touch interrupt, if configured for this overlay
-Physical pin	GPIO / function	Purpose  ##BME280
-    1	        3.3 V	Sensor power
-    3	        GPIO2 / SDA	I²C data
-    5	        GPIO3 / SCL	I²C clock
-    6	        Ground	Ground
+## Pins Used
+
+### Relays
+
+| Physical Pin | Function | Purpose |
+|-------------:|----------|---------|
+| 36 | Fan | HVAC fan relay |
+| 38 | AC | Air-conditioning relay |
+| 40 | Heater | Heating relay |
+| 32 | ESP32 Feedback | Feedback signal from the ESP32 |
+
+### Touchscreen
+
+| Physical Pin | GPIO / Function | Purpose |
+|-------------:|-----------------|---------|
+| 19 | GPIO10 / MOSI | SPI display data |
+| 23 | GPIO11 / SCLK | SPI clock |
+| 24 | GPIO8 / CE0 | SPI chip select for display |
+| 16 | GPIO23 | Display reset |
+| 18 | GPIO24 | Display data/command |
+| 22 | GPIO25 | Touch interrupt (if configured for this overlay) |
+
+### BME280
+
+| Physical Pin | GPIO / Function | Purpose |
+|-------------:|-----------------|---------|
+| 1 | 3.3 V | Sensor power |
+| 3 | GPIO2 / SDA | I²C data |
+| 5 | GPIO3 / SCL | I²C clock |
+| 6 | Ground | Ground |
 
 Bookworm(Legacy) lite 64 bit.  
 Install the operating system with ssh access and user as pi.
